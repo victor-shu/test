@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <climits>
 using namespace std;
 
 bool isIn(vector<int> v, int i)
@@ -11,6 +12,13 @@ bool isIn(vector<int> v, int i)
       return true;
   }
   return false;
+}
+void print(vector<int> v)
+{
+  for(int i : v)
+  {
+    cout<<i<<"  ";
+  }
 }
 
 class Graph
@@ -24,8 +32,8 @@ public:
     void addEdge(int v, int w, int distance);
     int distance(int v, int w);
     int distOfPath(std::vector<int> path);
-    vector<int> dfs(bool used[], int curr, vector<int> path);
-    vector<int> ddffss(int curr);
+    vector<int> dfs(bool used[], int curr, int targ, vector<int> path);
+    vector<int> ddffss(int curr, int targ);
 };
 Graph::Graph(int V)
 {
@@ -59,11 +67,16 @@ int Graph::distOfPath(std::vector<int> path)
   {
     dis += distance(path[i], path[i-1]);
   }
+  if(path.size()==0)
+  {
+    return INT_MAX;
+  }
+
   return dis;
 }
 
 
-std::vector<int> Graph::dfs(bool used[], int curr, std::vector<int> path)
+std::vector<int> Graph::dfs(bool used[], int curr, int targ, std::vector<int> path)
 {
 	bool visited[V];
 	std::copy(used, used+V, visited);
@@ -79,9 +92,9 @@ std::vector<int> Graph::dfs(bool used[], int curr, std::vector<int> path)
 			break;
 		}
 	}
-	if (done)
+	if (done && curr == targ)
 	{
-		return path;
+    return path;
 	}
 
 	std::vector<int> min;
@@ -89,7 +102,7 @@ std::vector<int> Graph::dfs(bool used[], int curr, std::vector<int> path)
 	{
 		if (!visited[i])
 		{
-			vector<int> result = dfs(visited, i, path);
+			vector<int> result = dfs(visited, i, targ, path);
 			if (distOfPath(min) > distOfPath(result))
 			{
 				min = result;
@@ -98,14 +111,8 @@ std::vector<int> Graph::dfs(bool used[], int curr, std::vector<int> path)
 	}
 	return min;
 }
-void print(vector<int> v)
-{
-  for(int i : v)
-  {
-    cout<<i<<"  ";
-  }
-}
-vector<int> Graph::ddffss(int curr)
+
+vector<int> Graph::ddffss(int curr, int targ)
 {
   bool x[V];
   for(int i = 0; i < V; i++)
@@ -113,20 +120,20 @@ vector<int> Graph::ddffss(int curr)
     x[i] = false;
   }
   vector<int> path;
-  return dfs(x, curr, path);
+  return dfs(x, curr, targ, path);
 }
 int main()
 {
 
   Graph g(4);
-  g.addEdge(0, 1, 1);
-  g.addEdge(0, 2, 2);
-  g.addEdge(0, 3, 3);
-  g.addEdge(1, 2, 4);
-  g.addEdge(1, 3, 5);
-  g.addEdge(2, 3, 6);
+  g.addEdge(0, 1, 5);
+  g.addEdge(0, 2, 5);
+  g.addEdge(0, 3, 1);
+  g.addEdge(1, 2, 1);
+  g.addEdge(1, 3, 1);
+  g.addEdge(2, 3, 5);
 
-  print(g.ddffss(0));
+  print(g.ddffss(0, 2));
 
   return 0;
 }
